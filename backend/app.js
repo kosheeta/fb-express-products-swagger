@@ -1,3 +1,7 @@
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const path = require("path");
+
 const express = require("express");
 const cors = require("cors");
 
@@ -7,36 +11,39 @@ const productsRouter = require("./routes/products");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/**
- * Конвейер обработки запроса (pipeline) в Express:
- * 1) middleware (app.use(...)) выполняются сверху вниз
- * 2) затем роуты (app.use('/api/...', router))
- * 3) если никто не ответил — можно отдать 404
- */
 
-// 1) Разрешаем запросы с фронта (React dev server)
-// Если у вас другой порт фронта — поменяйте origin.
 app.use(
   cors({
     origin: "http://localhost:3001",
   })
 );
 
-// 2) Парсим JSON из тела запроса -> req.body
 app.use(express.json());
 
-// 3) Наш логгер (для наглядности)
 app.use(logger);
 
-// Healthcheck / главная
+// Swagger/OpenAPI
+const openapiPath = path.join(__dirname, "docs", "openapi.yaml");
+const openapiDocument = YAML.load(openapiPath);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
+
+// (опционально) отдаём сырой YAML для удобных скринов/проверки
+app.get("/openapi.yaml", (req, res) => {
+  res.sendFile(openapiPath);
+});
+
 app.get("/", (req, res) => {
   res.send("Express API is running. Try /api/products");
 });
 
-// 4) Роуты API (все пути /api/products/... обрабатывает productsRouter)
 app.use("/api/products", productsRouter);
 
-// 5) Если не совпало ни с одним роутом — 404
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
 });

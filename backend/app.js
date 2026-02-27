@@ -1,4 +1,5 @@
-const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const YAML = require("yamljs");
 const path = require("path");
 
@@ -23,16 +24,47 @@ app.use(express.json());
 app.use(logger);
 
 // Swagger/OpenAPI
-const openapiPath = path.join(__dirname, "docs", "openapi.yaml");
-const openapiDocument = YAML.load(openapiPath);
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'PR4 Express API',
+      version: '1.0.0',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local development server',
+      },
+    ],
+  },
+  apis: ['./app.js', './routes/products.js'],
+};
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-// (опционально) отдаём сырой YAML для удобных скринов/проверки
-app.get("/openapi.yaml", (req, res) => {
-  res.sendFile(openapiPath);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// (опционально) отдаём сырой JSON для удобных скринов/проверки
+app.get("/openapi", (req, res) => {
+  res.json(swaggerSpec);
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Healthcheck
+ *     description: Check if the server is running
+ *     responses:
+ *       200:
+ *         description: Server is running
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: OK
+ */
 app.get("/", (req, res) => {
   res.send("Express API is running. Try /api/products");
 });

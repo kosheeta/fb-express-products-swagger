@@ -1,5 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createProduct, deleteProduct, getProducts, updateProduct } from "./api/productsApi";
+import { Note, ProductCard, ProductForm } from "./components";
+
+import "./App.scss";
 
 /**
  * Практика 4 (заготовка).
@@ -11,17 +14,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Минимальная форма добавления товара
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
-
-  const canSubmit = useMemo(() => title.trim() !== "" && price !== "", [title, price]);
-
   async function load() {
     setError("");
     setLoading(true);
     try {
-      const data = await getProducts(); // TODO: заработает после реализации productsApi.js
+      const data = await getProducts();
       setItems(data);
     } catch (e) {
       setError(String(e?.message || e));
@@ -34,19 +31,10 @@ export default function App() {
     load();
   }, []);
 
-  async function onAdd(e) {
-    e.preventDefault();
-    if (!canSubmit) return;
-
+  async function handleAddProduct(payload) {
     setError("");
     try {
-      await createProduct({
-        title: title.trim(),
-        // TODO (студентам): дополнить payload полями category/description/stock/...
-        price: Number(price),
-      });
-      setTitle("");
-      setPrice("");
+      await createProduct(payload);
       await load();
     } catch (e) {
       setError(String(e?.message || e));
@@ -74,68 +62,38 @@ export default function App() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
+    <div className="page">
       <h1>Практика 4 — React + Express API</h1>
 
-      <p style={{ color: "#555" }}>
+      <Note>
         Если видите ошибку <code>TODO: реализуйте ...</code>, значит вы ещё не реализовали функции в{" "}
         <code>src/api/productsApi.js</code>.
-      </p>
+      </Note>
 
-      <section style={{ marginTop: 24, padding: 16, border: "1px solid #ddd", borderRadius: 12 }}>
-        <h2 style={{ marginTop: 0 }}>Добавить товар</h2>
-        <form onSubmit={onAdd} style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Название"
-            style={{ padding: 10, minWidth: 220 }}
-          />
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Цена"
-            type="number"
-            style={{ padding: 10, width: 140 }}
-          />
-          <button disabled={!canSubmit} style={{ padding: "10px 14px" }}>
-            Добавить
-          </button>
-          <button type="button" onClick={load} style={{ padding: "10px 14px" }}>
-            Обновить список
-          </button>
-        </form>
-      </section>
+      <ProductForm onSubmit={handleAddProduct} onRefresh={load} />
 
-      <section style={{ marginTop: 24 }}>
+      <section className="products-section">
         <h2>Список товаров</h2>
 
         {loading && <p>Загрузка...</p>}
         {error && (
-          <p style={{ color: "crimson" }}>
+          <p className="error-message">
             Ошибка: {error}
             <br />
             Проверьте, что: (1) backend запущен на 3000, (2) CORS настроен, (3) TODO в productsApi.js реализованы.
           </p>
         )}
 
-        <ul style={{ paddingLeft: 18 }}>
-          {items.map((p) => (
-            <li key={p.id} style={{ marginBottom: 8 }}>
-              <b>{p.title}</b> — {p.price} ₽{" "}
-              <button onClick={() => onPricePlus(p.id, p.price)} style={{ marginLeft: 8 }}>
-                +10 ₽
-              </button>
-              <button onClick={() => onDelete(p.id)} style={{ marginLeft: 8 }}>
-                Удалить
-              </button>
-            </li>
+        <div className="products-list">
+          {items.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onDelete={onDelete}
+              onPricePlus={onPricePlus}
+            />
           ))}
-        </ul>
-
-        <p style={{ color: "#555" }}>
-          TODO (студентам): добавить категории, описание, остаток на складе, картинку и т.п. + сделать красивый UI.
-        </p>
+        </div>
       </section>
     </div>
   );

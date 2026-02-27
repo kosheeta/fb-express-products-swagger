@@ -1,0 +1,45 @@
+@import '../../global.scss';
+
+.product-form-section {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+
+  &__title {
+    margin-top: 0;
+  }
+}
+
+.product-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  &__input {
+    padding: 10px;
+    min-width: 220px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+
+    &--short {
+      width: 140px;
+      min-width: 140px;
+    }
+
+    &--wide {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+  }
+
+  &__button {
+    padding: 10px 14px;
+  }
+}

@@ -1,0 +1,88 @@
+@import '../../global.scss';
+
+// Вложенность: описываем элементы карточки внутри .product-card
+.product-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: $gap;
+  background: $color-surface;
+  border-radius: $radius;
+  padding: 18px;
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--accent {
+    border: 2px solid $color-primary;
+  }
+
+  &__image {
+    border-radius: $radius;
+    width: 100%;
+    min-height: 160px;
+    height: auto;
+    flex: 1;
+    @include gradient-background(rgba(139, 92, 246, 0.5), rgba(236, 72, 153, 0.4));
+    position: relative;
+    overflow: hidden;
+    object-fit: cover;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  &__category {
+    margin: 0;
+    font-size: 14px;
+    color: $color-primary;
+    font-weight: 600;
+  }
+
+  &__desc {
+    margin: 0;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  &__rating {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  &__stock {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.75;
+  }
+
+  &__footer {
+    margin-top: auto;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__price {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+}

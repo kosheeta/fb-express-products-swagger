@@ -1,0 +1,10 @@
+@import '../../global.scss';
+
+.note {
+  background: #151515;
+  border-radius: $radius;
+  padding: 16px;
+
+  &__title { margin: 0 0 10px; font-size: 18px; }
+  &__list { margin: 0; padding-left: 18px; opacity: 0.9; }
+}

@@ -21,6 +21,5 @@ build/
 # Data / local stores (на всякий случай)
 **/db/
 **/*.db
-**/store/
 **/*store*.json
 backend/data/products.json
